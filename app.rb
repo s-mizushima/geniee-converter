@@ -70,10 +70,11 @@ Pathname.glob(Pathname.getwd.join("**/*")) do |source_path|
     end
   end
   #p mcv_keys
-  head = ["Title","Imp","消化","Click","CPC", "CTR"] + mcv_keys
+  head = ["Title","Imp","消化","Click","CPC", "CTR", "mCV", "mCPA"]
   CSV.open(output_file,'w') do |body|
     body << head
     res.each do |title, row|
+      p row
       output_row = []
       output_row.push(title)
       output_row.push(row["Imp"])
@@ -81,8 +82,22 @@ Pathname.glob(Pathname.getwd.join("**/*")) do |source_path|
       output_row.push(row["Click"])
       output_row.push(row["消化"]/row["Click"])
       output_row.push(row["Click"]/row["Imp"])
+      mcv_count = nil
+      mcv_cost_total = nil
       mcv_keys.each do |key|
-        output_row.push(row[key])
+        p key
+        if key.include? "CV (Click)"
+          mcv_count = row[key]
+        end
+        if key.include? "CPA (Click)"
+          mcv_cost_total = row[key]
+        end
+      end
+      unless mcv_count.nil?
+        output_row.push(mcv_count)
+      end
+      unless mcv_cost_total.nil?
+        output_row.push(mcv_cost_total/mcv_count)
       end
       #p output_row
       body << output_row
